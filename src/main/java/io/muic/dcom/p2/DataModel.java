@@ -4,11 +4,12 @@ import javax.xml.crypto.Data;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 public class DataModel {
     public static class DataConfig {
         public static final int SIZE = 36;
-        public static final ArrayList<ParcelObserved> DEFAULT_TRAIL = new ArrayList<>();
+        public static final ConcurrentSkipListSet<ParcelObserved> DEFAULT_TRAIL = new ConcurrentSkipListSet<>();
         public static final ConcurrentHashMap<String,Integer> PARCEL_PREFIX = createParcelPrefix();
         public static ConcurrentHashMap<String,Integer> createParcelPrefix(){
             ConcurrentHashMap<String, Integer> bucket  = new ConcurrentHashMap<>();
@@ -18,7 +19,7 @@ public class DataModel {
         }
     }
 
-    public static class ParcelObserved{
+    public static class ParcelObserved implements Comparable<ParcelObserved>{
         private String parcelId;
         private String stationId;
         private long timeStamp;
@@ -27,13 +28,19 @@ public class DataModel {
             this.stationId = stationId_;
             this.timeStamp = ts_;
         }
+
+        @Override
+        public int compareTo(ParcelObserved o) {
+            return Long.compare(this.getTimeStamp(),o.getTimeStamp());
+        }
+
         public String getParcelId() { return parcelId; }
         public String getStationId() { return stationId; }
         public long getTimeStamp() { return timeStamp; }
     }
-    private ConcurrentHashMap<String,ArrayList<ParcelObserved>>[] parcelTrailWriter;
+    private ConcurrentHashMap<String,ConcurrentSkipListSet<ParcelObserved>>[] parcelTrailWriter;
     private ConcurrentHashMap<String,Integer>[] stationCountWriter;
-    private ConcurrentHashMap<String,ArrayList<ParcelObserved>>[] parcelTrailGetter;
+    private ConcurrentHashMap<String,ConcurrentSkipListSet<ParcelObserved>>[] parcelTrailGetter;
     private ConcurrentHashMap<String,Integer>[] stationCountGetter;
 
     DataModel() {
@@ -54,14 +61,14 @@ public class DataModel {
         int s = extractSlot(parcelId);
         addParcelTrail(s,parcelId,newp);
         incrementStationStopCount(s,stationId);
-        ArrayList<ParcelObserved> t = getPath(s,parcelId);
+        ConcurrentSkipListSet<ParcelObserved> t = getPath(s,parcelId);
         Integer stopCount = getStationStopCount(s,stationId);
         replace(s,parcelId,t);
         replace(s,stationId,stopCount);
     }
 
-    public ArrayList<ParcelObserved> getPath(Integer slot, String id){
-        ArrayList<ParcelObserved> trail = (ArrayList<ParcelObserved>) parcelTrailWriter[slot].get(id).clone();
+    public ConcurrentSkipListSet<ParcelObserved> getPath(Integer slot, String id){
+        ConcurrentSkipListSet<ParcelObserved> trail = parcelTrailWriter[slot].get(id).clone();
         return trail;
     }
     public Integer getStationStopCount(Integer slot, String id){
@@ -70,7 +77,7 @@ public class DataModel {
     public void replace(Integer slot, String id, Integer stopCount){
         stationCountGetter[slot].put(id,stopCount);
     }
-    public void replace(Integer slot,String id, ArrayList<ParcelObserved> trail){
+    public void replace(Integer slot,String id, ConcurrentSkipListSet<ParcelObserved> trail){
         parcelTrailGetter[slot].put(id,trail);
     }
 
@@ -79,7 +86,7 @@ public class DataModel {
     }
 
     public void addParcelTrail(int slot, String parcelId, ParcelObserved parcelObserved){
-        if(!parcelTrailWriter[slot].containsKey(parcelId)){parcelTrailWriter[slot].put(parcelId, new ArrayList<>());}
+        if(!parcelTrailWriter[slot].containsKey(parcelId)){parcelTrailWriter[slot].put(parcelId, new ConcurrentSkipListSet<ParcelObserved>());}
         parcelTrailWriter[slot].get(parcelId).add(parcelObserved);
 
     }
@@ -89,11 +96,10 @@ public class DataModel {
         int toPut = stationCountWriter[slot].get(stationId) + 1;
         stationCountWriter[slot].put(stationId,toPut);
     }
-
-    public List<ParcelObserved> getParcelTrail(String parcelId) {
+    public ArrayList<ParcelObserved> getParcelTrail(String parcelId) {
         int slot = extractSlot(parcelId);
-        if(!parcelTrailGetter[slot].containsKey(parcelId)){return DataConfig.DEFAULT_TRAIL;}
-        else{return parcelTrailGetter[slot].get(parcelId);}
+        if(!parcelTrailGetter[slot].containsKey(parcelId)){return new ArrayList<>(DataConfig.DEFAULT_TRAIL);}
+        else{return new ArrayList<>(parcelTrailGetter[slot].get(parcelId));}
     }
     public long getStopCount(String stationId) {
         int slot = extractSlot(stationId);

@@ -46,9 +46,6 @@ public class ServerMain {
             String parcelId = request.params("parcelId");
             if (null != parcelId && parcelId.length() > 0) {
                 List<DataModel.ParcelObserved> trail = model.getParcelTrail(parcelId);
-
-                // order the parcel trail by timestamp from earliest and on
-                trail.sort((eventA, eventB) -> Long.compare(eventA.getTimeStamp(), eventB.getTimeStamp()));
                 return (new Gson()).toJson(trail);
             }
             else {
