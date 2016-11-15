@@ -8,7 +8,7 @@ import java.util.List;
 
 public class ServerMain {
     static class Config {
-        public static final int DEFAULT_NUM_THREADS = 8;
+        public static final int DEFAULT_NUM_THREADS = 6;
         public static final int DEFAULT_PORT = 27015;
     }
 
