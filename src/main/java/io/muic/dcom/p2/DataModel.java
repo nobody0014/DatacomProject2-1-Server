@@ -1,6 +1,7 @@
 package io.muic.dcom.p2;
 
 import javax.xml.crypto.Data;
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.concurrent.ConcurrentHashMap;
@@ -9,7 +10,7 @@ import java.util.concurrent.ConcurrentSkipListSet;
 public class DataModel {
     public static class DataConfig {
         public static final int SIZE = 36;
-        public static final ConcurrentSkipListSet<ParcelObserved> DEFAULT_TRAIL = new ConcurrentSkipListSet<>();
+        public static final ArrayList<ParcelObserved> DEFAULT_TRAIL = new ArrayList<>();
         public static final ConcurrentHashMap<String,Integer> PARCEL_PREFIX = createParcelPrefix();
         public static ConcurrentHashMap<String,Integer> createParcelPrefix(){
             ConcurrentHashMap<String, Integer> bucket  = new ConcurrentHashMap<>();
@@ -85,31 +86,28 @@ public class DataModel {
     }
 
     public void addParcelTrail(int slot, String parcelId, ParcelObserved parcelObserved){
-        if(!parcelTrailWriter[slot].containsKey(parcelId)){parcelTrailWriter[slot].put(parcelId, new ConcurrentSkipListSet<ParcelObserved>());}
+        if(!parcelTrailWriter[slot].containsKey(parcelId)){
+            parcelTrailWriter[slot].put(parcelId, new ConcurrentSkipListSet<>());
+        }
         parcelTrailWriter[slot].get(parcelId).add(parcelObserved);
 
     }
 
     public void incrementStationStopCount(int slot, String stationId){
-        if(!stationCountWriter[slot].containsKey(stationId)){stationCountWriter[slot].put(stationId, 0);}
+        if(!stationCountWriter[slot].containsKey(stationId)){stationCountWriter[slot].put(stationId, (long)0);}
         long toPut = stationCountWriter[slot].get(stationId) + 1;
         stationCountWriter[slot].put(stationId,toPut);
     }
 
-    //    public ConcurrentSkipListSet<ParcelObserved> getParcelTrail(String parcelId) {
-//        int slot = extractSlot(parcelId);
-//        if(!parcelTrailGetter[slot].containsKey(parcelId)){return DataConfig.DEFAULT_TRAIL;}
-//        else{return parcelTrailGetter[slot].get(parcelId);}
-//    }
-//    public long getStopCount(String stationId) {
-//        int slot = extractSlot(stationId);
-//        if(!stationCountGetter[slot].containsKey(stationId)){return 0;}
-//        else{return stationCountGetter[slot].get(stationId);}
-//    }
-    public ConcurrentSkipListSet<ParcelObserved> getParcelTrail(String parcelId) {
+    public ArrayList<ParcelObserved> getParcelTrail(String parcelId) {
         int slot = extractSlot(parcelId);
-        if(!parcelTrailWriter[slot].containsKey(parcelId)){return DataConfig.DEFAULT_TRAIL;}
-        else{return parcelTrailWriter[slot].get(parcelId);}
+        if(!parcelTrailWriter[slot].containsKey(parcelId)){
+            return DataConfig.DEFAULT_TRAIL;
+        }
+        else{
+            ArrayList<ParcelObserved> pp = new ArrayList<>(parcelTrailWriter[slot].get(parcelId));
+            return  pp;
+        }
     }
     public long getStopCount(String stationId) {
         int slot = extractSlot(stationId);
