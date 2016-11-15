@@ -7,7 +7,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class DataModel {
     public static class DataConfig {
-        public static final int DEFAULT_NUM_THREADS = 4;
         public static final int SIZE = 36;
         public static final ArrayList<ParcelObserved> DEFAULT_TRAIL = new ArrayList<>();
         public static final ConcurrentHashMap<String,Integer> PARCEL_PREFIX = createParcelPrefix();
