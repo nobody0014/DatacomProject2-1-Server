@@ -31,8 +31,7 @@ public class ServerMain {
             String stationId = request.params("stationId");
 
             if (null != stationId && stationId.length()>0) {
-                long count = model.getStopCount(stationId);
-                return String.format("{\"count\": %d }", count);
+                return model.getStopCount(stationId);
             }
             else {
                 String errorMsg = "Invalid stationId";
@@ -45,11 +44,11 @@ public class ServerMain {
     private static Route handleGetParcelTrail(DataModel model) {
         return (request, response) -> {
             String parcelId = request.params("parcelId");
-            if (null != parcelId && parcelId.length()>0) {
+            if (null != parcelId && parcelId.length() > 0) {
                 List<DataModel.ParcelObserved> trail = model.getParcelTrail(parcelId);
+
                 // order the parcel trail by timestamp from earliest and on
-                trail.sort((eventA, eventB) ->
-                                Long.compare(eventA.getTimeStamp(), eventB.getTimeStamp()));
+                trail.sort((eventA, eventB) -> Long.compare(eventA.getTimeStamp(), eventB.getTimeStamp()));
                 return (new Gson()).toJson(trail);
             }
             else {
@@ -57,7 +56,6 @@ public class ServerMain {
                 halt(400, errorMsg);
                 return errorMsg;
             }
-
         };
     }
 
