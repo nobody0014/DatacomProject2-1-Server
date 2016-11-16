@@ -45,8 +45,8 @@ public class ServerMain {
         return (request, response) -> {
             String parcelId = request.params("parcelId");
             if (null != parcelId && parcelId.length() > 0) {
-                List<DataModel.ParcelObserved> trail = model.getParcelTrail(parcelId);
-                return (new Gson()).toJson(trail);
+//                List<DataModel.ParcelObserved> trail =
+                return model.getParcelTrail(parcelId);
             }
             else {
                 String errorMsg = "Invalid parcelId";

@@ -6,11 +6,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
+import com.google.gson.Gson;
 
 public class DataModel {
     public static class DataConfig {
         public static final int SIZE = 36;
-        public static final ArrayList<ParcelObserved> DEFAULT_TRAIL = new ArrayList<>();
+        public static final String DEFAULT_TRAIL = "";
         public static final ConcurrentHashMap<String,Integer> PARCEL_PREFIX = createParcelPrefix();
         public static ConcurrentHashMap<String,Integer> createParcelPrefix(){
             ConcurrentHashMap<String, Integer> bucket  = new ConcurrentHashMap<>();
@@ -75,14 +76,14 @@ public class DataModel {
         stationCountWriter[slot].put(stationId,toPut);
     }
 
-    public ArrayList<ParcelObserved> getParcelTrail(String parcelId) {
+    public String getParcelTrail(String parcelId) {
         int slot = extractSlot(parcelId);
         if(!parcelTrailWriter[slot].containsKey(parcelId)){
             return DataConfig.DEFAULT_TRAIL;
         }
         else{
             ArrayList<ParcelObserved> pp = new ArrayList<>(parcelTrailWriter[slot].get(parcelId));
-            return  pp;
+            return  (new Gson()).toJson(pp);
         }
     }
     public long getStopCount(String stationId) {
