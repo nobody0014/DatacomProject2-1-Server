@@ -53,7 +53,7 @@ public class DataModel {
     public void postObserve(String parcelId, String stationId, long timestamp) {
         ParcelObserved newp = new ParcelObserved(parcelId,stationId,timestamp);
         int parcelSlot = extractSlot(parcelId);
-        int stationSlot = extractSlot(parcelId);
+        int stationSlot = extractSlot(stationId);
         addParcelTrail(parcelSlot,parcelId,newp);
         incrementStationStopCount(stationSlot,stationId);
     }
