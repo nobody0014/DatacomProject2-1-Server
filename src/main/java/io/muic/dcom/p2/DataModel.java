@@ -9,9 +9,11 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import com.google.gson.Gson;
 
 public class DataModel {
+    //Config of the datamodel
     public static class DataConfig {
         public static final int SIZE = 36;
         public static final String DEFAULT_TRAIL = "";
+        //Use this to get the prefix to the slot in the static array, same for both Stopcount and Parceltrail
         public static final ConcurrentHashMap<String,Integer> PARCEL_PREFIX = createParcelPrefix();
         public static ConcurrentHashMap<String,Integer> createParcelPrefix(){
             ConcurrentHashMap<String, Integer> bucket  = new ConcurrentHashMap<>();
@@ -20,7 +22,7 @@ public class DataModel {
             return bucket;
         }
     }
-
+    //Make parcelObserved comparable to make the ConcurrentSkipListSet sortable
     public static class ParcelObserved implements Comparable<ParcelObserved>{
         private String parcelId;
         private String stationId;
@@ -39,9 +41,10 @@ public class DataModel {
         public String getStationId() { return stationId; }
         public long getTimeStamp() { return timeStamp; }
     }
+    //
     ConcurrentHashMap<String,ConcurrentSkipListSet<ParcelObserved>>[] parcelTrailWriter;
     ConcurrentHashMap<String,Long>[] stationCountWriter;
-
+    //Initialised  parcel writer and stationCount
     DataModel() {
         parcelTrailWriter = new ConcurrentHashMap[DataConfig.SIZE];
         stationCountWriter = new ConcurrentHashMap[DataConfig.SIZE];
@@ -51,6 +54,7 @@ public class DataModel {
         }
     }
 
+    //Posting parcels --> get the id for station and parcel and add them.
     public void postObserve(String parcelId, String stationId, long timestamp) {
         ParcelObserved newp = new ParcelObserved(parcelId,stationId,timestamp);
         int parcelSlot = extractSlot(parcelId);
@@ -58,10 +62,11 @@ public class DataModel {
         addParcelTrail(parcelSlot,parcelId,newp);
         incrementStationStopCount(stationSlot,stationId);
     }
-
+    //get the slot
     public int extractSlot(String id){
         return DataConfig.PARCEL_PREFIX.get(String.valueOf(id.charAt(0)).toLowerCase());
     }
+
 
     public void addParcelTrail(int slot, String parcelId, ParcelObserved parcelObserved){
         if(!parcelTrailWriter[slot].containsKey(parcelId)){

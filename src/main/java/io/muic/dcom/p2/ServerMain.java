@@ -7,9 +7,10 @@ import com.google.gson.Gson;
 import java.util.List;
 
 public class ServerMain {
+    //Configuration --> use thread = 2*number of processors
     static class Config {
         public static final int DEFAULT_NUM_THREADS = Runtime.getRuntime().availableProcessors()*2;
-        public static final int DEFAULT_PORT = 27015;
+        public static final int DEFAULT_PORT = 9090;
     }
 
     public static void main(String args[]) {
