@@ -52,9 +52,10 @@ public class DataModel {
 
     public void postObserve(String parcelId, String stationId, long timestamp) {
         ParcelObserved newp = new ParcelObserved(parcelId,stationId,timestamp);
-        int s = extractSlot(parcelId);
-        addParcelTrail(s,parcelId,newp);
-        incrementStationStopCount(s,stationId);
+        int parcelSlot = extractSlot(parcelId);
+        int stationSlot = extractSlot(parcelId);
+        addParcelTrail(parcelSlot,parcelId,newp);
+        incrementStationStopCount(stationSlot,stationId);
     }
 
     public int extractSlot(String id){
@@ -86,7 +87,6 @@ public class DataModel {
     }
     public long getStopCount(String stationId) {
         int slot = extractSlot(stationId);
-        System.out.println(slot + " " + stationCountWriter[slot].containsKey(stationId));
         if(!stationCountWriter[slot].containsKey(stationId)){return 0;}
         else{return stationCountWriter[slot].get(stationId);}
     }
