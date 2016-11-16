@@ -14,7 +14,6 @@ public class ServerMain {
 
     public static void main(String args[]) {
         // Spark server setup
-        threadPool(Config.DEFAULT_NUM_THREADS);
         port(Config.DEFAULT_PORT);
 
         // setup data store
