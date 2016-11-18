@@ -35,7 +35,11 @@ public class DataModel {
 
         @Override
         public int compareTo(ParcelObserved o) {
-            return Long.compare(this.getTimeStamp(),o.getTimeStamp());
+            int compareResult = Long.compare(this.getTimeStamp(),o.getTimeStamp());
+            if(compareResult == 0){
+                compareResult = this.stationId.compareTo(o.getStationId());
+            }
+            return compareResult;
         }
         public String getParcelId() { return parcelId; }
         public String getStationId() { return stationId; }
