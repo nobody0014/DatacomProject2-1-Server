@@ -10,7 +10,7 @@ public class ServerMain {
     //Configuration --> use thread = 2*number of processors
     static class Config {
         public static final int DEFAULT_NUM_THREADS = Runtime.getRuntime().availableProcessors()*2;
-        public static final int DEFAULT_PORT = 90900;
+        public static final int DEFAULT_PORT = 20000;
     }
 
     public static void main(String args[]) {
