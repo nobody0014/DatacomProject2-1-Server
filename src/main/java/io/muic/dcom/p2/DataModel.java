@@ -73,14 +73,12 @@ public class DataModel {
 
 
     public void addParcelTrail(int slot, String parcelId, ParcelObserved parcelObserved){
-        if(!parcelTrailWriter[slot].containsKey(parcelId)){
-            parcelTrailWriter[slot].put(parcelId, new ConcurrentSkipListSet<>());
-        }
+        parcelTrailWriter[slot].putIfAbsent(parcelId,new ConcurrentSkipListSet<>());
         parcelTrailWriter[slot].get(parcelId).add(parcelObserved);
     }
 
     public void incrementStationStopCount(int slot, String stationId){
-        if(!stationCountWriter[slot].containsKey(stationId)){stationCountWriter[slot].put(stationId, (long)0);}
+        stationCountWriter[slot].putIfAbsent(stationId, (long) 0 );
         long toPut = stationCountWriter[slot].get(stationId) + 1;
         stationCountWriter[slot].put(stationId,toPut);
     }
