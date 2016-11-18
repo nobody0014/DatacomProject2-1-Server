@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import com.google.gson.Gson;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class DataModel {
     //Config of the datamodel
@@ -47,7 +48,7 @@ public class DataModel {
     }
     //
     ConcurrentHashMap<String,ConcurrentSkipListSet<ParcelObserved>>[] parcelTrailWriter;
-    ConcurrentHashMap<String,Long>[] stationCountWriter;
+    ConcurrentHashMap<String,AtomicLong>[] stationCountWriter;
     //Initialised  parcel writer and stationCount
     DataModel() {
         parcelTrailWriter = new ConcurrentHashMap[DataConfig.SIZE];
@@ -78,9 +79,8 @@ public class DataModel {
     }
 
     public void incrementStationStopCount(int slot, String stationId){
-        stationCountWriter[slot].putIfAbsent(stationId, (long) 0 );
-        long toPut = stationCountWriter[slot].get(stationId) + 1;
-        stationCountWriter[slot].put(stationId,toPut);
+        stationCountWriter[slot].putIfAbsent(stationId, new AtomicLong(0));
+        stationCountWriter[slot].get(stationId).getAndIncrement();
     }
 
     public String getParcelTrail(String parcelId) {
@@ -96,7 +96,7 @@ public class DataModel {
     public long getStopCount(String stationId) {
         int slot = extractSlot(stationId);
         if(!stationCountWriter[slot].containsKey(stationId)){return 0;}
-        else{return stationCountWriter[slot].get(stationId);}
+        else{return stationCountWriter[slot].get(stationId).longValue();}
     }
 }
 
